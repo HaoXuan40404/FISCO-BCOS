@@ -64,6 +64,7 @@ public:
 
 private:
     Secp256k1PPCtx()
+    //   : m_oid(CryptoPP::ASN1::secp256r1()),
       : m_oid(CryptoPP::ASN1::secp256k1()),
         m_params(m_oid),
         m_curve(m_params.GetCurve()),

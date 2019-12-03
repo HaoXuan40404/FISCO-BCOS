@@ -63,7 +63,8 @@ public:
 
 private:
     Secp256k1PPCtx()
-      : m_oid(CryptoPP::ASN1::secp256k1()),
+      : m_oid(CryptoPP::ASN1::secp256r1()),
+    //   : m_oid(CryptoPP::ASN1::secp256k1()),
         m_params(m_oid),
         m_curve(m_params.GetCurve()),
         m_q(m_params.GetGroupOrder()),
@@ -267,7 +268,8 @@ bool Secp256k1PP::agree(Secret const& _s, Public const& _r, Secret& o_s)
 {
     // TODO: mutex ASN1::secp256k1() singleton
     // Creating Domain is non-const for m_oid and m_oid is not thread-safe
-    CryptoPP::ECDH<CryptoPP::ECP>::Domain d(CryptoPP::ASN1::secp256k1());
+    CryptoPP::ECDH<CryptoPP::ECP>::Domain d(CryptoPP::ASN1::secp256r1());
+    // CryptoPP::ECDH<CryptoPP::ECP>::Domain d(CryptoPP::ASN1::secp256k1());
     assert(d.AgreedValueLength() == sizeof(o_s));
     byte remote[65] = {0x04};
     memcpy(&remote[1], _r.data(), 64);
