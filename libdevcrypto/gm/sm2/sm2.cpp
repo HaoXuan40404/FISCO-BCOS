@@ -132,7 +132,7 @@ bool SM2::sign(
     EC_KEY_set_private_key(sm2Key, res);
 
     zValueLen = sizeof(zValue);
-    if (!ECDSA_sm2_get_Z((const EC_KEY*)sm2Key, NULL, NULL, 0, zValue, &zValueLen))
+    if (!ECDSA_sm2_get_Z((const EC_KEY*)sm2Key, NULL, "31323334353637383132333435363738", 32, zValue, &zValueLen))
     {
         CRYPTO_LOG(ERROR) << "[SM2::sign] Error Of Compute Z";
         goto err;
@@ -234,7 +234,7 @@ int SM2::verify(const string& _signData, int, const char* originalData, int orig
         goto err;
     }
 
-    if (!ECDSA_sm2_get_Z((const EC_KEY*)sm2Key, NULL, NULL, 0, zValue, &zValueLen))
+    if (!ECDSA_sm2_get_Z((const EC_KEY*)sm2Key, NULL, "31323334353637383132333435363738", 32, zValue, &zValueLen))
     {
         CRYPTO_LOG(ERROR) << "[SM2::veify] Error Of Compute Z";
         goto err;

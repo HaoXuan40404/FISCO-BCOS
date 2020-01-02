@@ -65,6 +65,7 @@ string dev::aesCBCDecrypt(const string& _cypherData, const string& _key)
 bytes dev::aesCBCEncrypt(bytesConstRef _plainData, bytesConstRef _key)
 {
     bytesConstRef ivData = _key.cropped(0, 16);
+    // auto ivData = fromHex("00000000000000000000000000000000");
     int padding = _plainData.size() % 16;
     int nSize = 16 - padding;
     int inDataVLen = _plainData.size() + nSize;

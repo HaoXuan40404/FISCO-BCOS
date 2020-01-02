@@ -1,0 +1,329 @@
+/**
+ * @CopyRight:
+ * FISCO-BCOS is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FISCO-BCOS is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with FISCO-BCOS.  If not, see <http://www.gnu.org/licenses/>
+ * (c) 2016-2018 fisco-dev contributors.
+ *
+ * @brief: simple benchmark for crypto algorithm
+ *
+ * @file: crypto_main.cpp
+ * @author: catli
+ * @date 2019-09-19
+ */
+
+// #include <cryptopp/eccrypto.h>
+// #include <cryptopp/oids.h>
+// #include <cryptopp/osrng.h>
+#include <libdevcore/Common.h>
+// #include <libdevcrypto/AES.h>
+// #include <libdevcrypto/Common.h>
+// #include <libdevcrypto/Hash.h>
+#include <openssl/ec.h>  // for EC_GROUP_new_by_curve_name, EC_GROUP_free, EC_KEY_new, EC_KEY_set_group, EC_KEY_generate_key, EC_KEY_free
+#include <openssl/ecdsa.h>  // for ECDSA_do_sign, ECDSA_do_verify
+#include <openssl/obj_mac.h>
+#include <stdio.h>
+#include <chrono>
+#include <iostream>
+#include <memory>
+#include <string>
+
+using namespace std;
+using namespace std::chrono;
+using namespace dev;
+using namespace boost;
+
+int main()
+{
+    // use openssl
+    unsigned char hash[] = "c7fbca202a95a570285e3d700eb04ca2";
+    int function_status = -1;
+    auto repeatCount = 100000;
+    EC_KEY* eckey = EC_KEY_new();
+    // cout << "Testing NID_X9_62_prime256v1 secp256r1 sign/verify performance"  << " ..." << endl;
+    cout << "Testing NID_secp192k1 sign/verify performance"  << " ..." << endl;
+    // cout << "Testing NID_secp256k1 secp256k1 sign/verify performance"  << " ..." << endl;
+    // cout << "Testing NID_secp224r1 NID_secp224r1 sign/verify performance"  << " ..." << endl;
+    // cout << "Testing NID_X25519 NID_X25519 sign/verify performance"  << " ..." << endl;
+     
+    if (NULL == eckey)
+    {
+        printf("Failed to create new EC Key\n");
+        function_status = -1;
+    }
+    else
+    {
+        // EC_GROUP* ecgroup = EC_GROUP_new_by_curve_name(NID_X9_62_prime256v1);
+        EC_GROUP* ecgroup = EC_GROUP_new_by_curve_name(NID_secp192k1);
+        // EC_GROUP* ecgroup = EC_GROUP_new_by_curve_name(NID_secp256k1);
+        // EC_GROUP* ecgroup = EC_GROUP_new_by_curve_name(NID_secp224r1);
+        // EC_GROUP* ecgroup = EC_GROUP_new_by_curve_name(NID_X25519);
+        
+        
+        if (NULL == ecgroup)
+        {
+            printf("Failed to create new EC Group\n");
+            function_status = -1;
+        }
+        else
+        {
+            int set_group_status = EC_KEY_set_group(eckey, ecgroup);
+            const int set_group_success = 1;
+            if (set_group_success != set_group_status)
+            {
+                printf("Failed to set group for EC Key\n");
+                function_status = -1;
+            }
+            else
+            {
+                const int gen_success = 1;
+                int gen_status = EC_KEY_generate_key(eckey);
+                if (gen_success != gen_status)
+                {
+                    printf("Failed to generate EC Key\n");
+                    function_status = -1;
+                }
+                else
+                {
+                    auto startTime = utcTime();
+                    ECDSA_SIG* signature = ECDSA_do_sign(hash, sizeof(hash), eckey);
+
+                    for (auto i = 0; i < repeatCount; ++i)
+                    {
+                        signature = ECDSA_do_sign(hash, sizeof(hash), eckey);
+                    }
+                    auto endTime = utcTime();
+                    auto signCost = endTime - startTime;
+                    cout << "[signPerformance] = " << repeatCount / ((double)signCost / 1000)
+                         << " tps" << endl;
+                    if (NULL == signature)
+                    {
+                        printf("Failed to generate EC Signature\n");
+                        function_status = -1;
+                    }
+                    else
+                    {
+                        startTime = utcTime();
+                        int verify_status = 0;
+                        for (auto i = 0; i < repeatCount; ++i)
+                        {
+                            verify_status = ECDSA_do_verify(hash, sizeof(hash), signature, eckey);
+                        }
+                        endTime = utcTime();
+                        auto verifyCost = endTime - startTime;
+                        cout << "[verifyPerformance] = "
+                             << repeatCount / ((double)verifyCost / 1000) << " tps" << endl;
+                        const int verify_success = 1;
+                        if (verify_success != verify_status)
+                        {
+                            printf("Failed to verify EC Signature\n");
+                            function_status = -1;
+                        }
+                        else
+                        {
+                            printf("Verifed EC Signature\n");
+                            function_status = 1;
+                        }
+                    }
+                }
+            }
+            EC_GROUP_free(ecgroup);
+        }
+        EC_KEY_free(eckey);
+    }
+
+    return function_status;
+}
+
+// int main()
+// {
+//     using namespace CryptoPP;
+
+//     auto repeatCount = 100000;
+
+//     auto version = string("");
+
+//     AutoSeededRandomPool prng;
+
+//     ECDSA<ECP, SHA256>::PrivateKey k1;
+//     k1.Initialize(prng, ASN1::secp256k1());
+//     ECDSA<ECP, SHA256>::Signer signer(k1);
+
+//     std::string message = "Do or do not. There is no try.";
+//     size_t siglen = signer.MaxSignatureLength();
+//     std::string signature(siglen, 0x00);
+
+//     cout << "Testing secp256k1 sign/verify performance" << version << " ..." << endl;
+
+//     auto startTime = utcTime();
+
+// for (auto i = 0; i < repeatCount; ++i)
+// {
+//     siglen = signer.SignMessage(
+//         prng, (const byte*)&message[0], message.size(), (byte*)&signature[0]);
+//     signature.resize(siglen);
+// }
+// auto endTime = utcTime();
+// auto signCost = endTime - startTime;
+// cout << "[signPerformance] = " << repeatCount / ((double)signCost / 1000) << " tps" << endl;
+
+//     ECDSA<ECP, SHA256>::PublicKey publicKey;
+//     k1.MakePublicKey(publicKey);
+//     ECDSA<ECP, SHA256>::Verifier verifier(publicKey);
+
+
+//     startTime = utcTime();
+//     bool result = false;
+//     for (auto i = 0; i < repeatCount; ++i)
+//     {
+//         result = verifier.VerifyMessage(
+//             (const byte*)&message[0], message.size(), (const byte*)&signature[0],
+//             signature.size());
+//     }
+//     endTime = utcTime();
+// auto verifyCost = endTime - startTime;
+// cout << "[verifyPerformance] = " << repeatCount / ((double)verifyCost / 1000) << " tps" <<
+// endl;
+
+//     // Verification failure?
+//     if (!result)
+//     {
+//         std::cout << "Failed to verify signature on message" << std::endl;
+//     }
+//     else
+//     {
+//         std::cout << "All good!" << std::endl;
+//     }
+
+//     k1.Initialize(prng, ASN1::secp256r1());
+//     ECDSA<ECP, SHA256>::Signer signer_new(k1);
+//     message = "Do or do not. There is no try.";
+//     siglen = signer_new.MaxSignatureLength();
+//     std::string signature_new(siglen, 0x00);
+
+//     cout << "Testing secp256r1 sign/verify performance" << version << " ..." << endl;
+
+//     startTime = utcTime();
+
+//     for (auto i = 0; i < repeatCount; ++i)
+//     {
+//         siglen = signer_new.SignMessage(
+//             prng, (const byte*)&message[0], message.size(), (byte*)&signature_new[0]);
+//         signature_new.resize(siglen);
+//     }
+//     endTime = utcTime();
+//     signCost = endTime - startTime;
+//     cout << "[signPerformance] = " << repeatCount / ((double)signCost / 1000) << " tps" << endl;
+
+//     k1.MakePublicKey(publicKey);
+//     ECDSA<ECP, SHA256>::Verifier verifier_new(publicKey);
+
+
+//     startTime = utcTime();
+//     result = false;
+//     for (auto i = 0; i < repeatCount; ++i)
+//     {
+//         result = verifier_new.VerifyMessage(
+//             (const byte*)&message[0], message.size(), (const byte*)&signature_new[0],
+//             signature_new.size());
+//     }
+//     endTime = utcTime();
+//     verifyCost = endTime - startTime;
+//     cout << "[verifyPerformance] = " << repeatCount / ((double)verifyCost / 1000) << " tps" <<
+//     endl;
+
+//     // Verification failure?
+//     if (!result)
+//     {
+//         std::cout << "Failed to verify signature on message" << std::endl;
+//     }
+//     else
+//     {
+//         std::cout << "All good!" << std::endl;
+//     }
+
+//     return 0;
+// }
+
+// int main()
+// {
+//     auto repeatCount = 1000000;
+
+//     auto version = string("");
+//     #ifdef FISCO_GM
+//     version = " for GM";
+//     #endif
+
+//     cout << "Testing encrypt/decrypt performace" << version << " ..." << endl;
+//     cout << "[repeatCount] = " << repeatCount << endl;
+//     auto key = string("0123456789ABCDEF");
+//     auto data = string(
+//         "A communication between President Donald Trump and a world leader prompted a "
+//         "whistleblower complaint that is now at the center of a dispute between the director of "
+//         "national intelligence and Congress, a source familiar with the case told CNN.");
+
+//     auto encryptedData = string();
+//     auto startTime = utcTime();
+//     // for (auto i = 0; i < repeatCount; ++i)
+//     // {
+//         encryptedData = dev::aesCBCEncrypt(data, key);
+//     // }
+//     auto endTime = utcTime();
+//     // auto encryptCost = endTime - startTime;
+//     // encryptCost = encryptCost == 0 ? 1 : encryptCost;
+//     // cout.precision(2);
+//     // cout << "[encryptPerformance] = " << fixed << repeatCount / ((double)encryptCost / 1000)
+//     //      << " tps" << endl;
+
+//     // startTime = utcTime();
+//     // for (auto i = 0; i < repeatCount; ++i)
+//     // {
+//         dev::aesCBCDecrypt(encryptedData, key);
+//     // }
+//     // endTime = utcTime();
+//     // auto decrtyptCost = endTime - startTime;
+//     // decrtyptCost = decrtyptCost == 0 ? 1 : decrtyptCost;
+//     // cout << "[decryptPerformance] = " << fixed << repeatCount / ((double)decrtyptCost / 1000)
+//     //      << " tps" << endl;
+
+//     repeatCount = 1000000;
+//     cout << "Testing sign/verify performance" << version << " ..." << endl;
+//     cout << "[repeatCount] = " << repeatCount << endl;
+//     auto keyPair = KeyPair::create();
+//     cout << "first [keyPair.pub()] = " << keyPair.pub() << endl;
+//     auto hash = sha3(dev::ref(asBytes(data)));
+
+
+//     Signature signature;
+//     startTime = utcTime();
+//     for (auto i = 0; i < repeatCount; ++i)
+//     {
+//         hash = sha3(dev::ref(asBytes(data)));
+//         signature = sign(keyPair.secret(), hash);
+//     }
+//     endTime = utcTime();
+//     auto signCost = endTime - startTime;
+//     cout << "[signPerformance] = " << repeatCount / ((double)signCost / 1000) << " tps"
+//         << endl;
+
+//     startTime = utcTime();
+//     for (auto i = 0; i < repeatCount; ++i)
+//     {
+//         verify(keyPair.pub(), signature, hash);
+//     }
+//     endTime = utcTime();
+//     auto verifyCost = endTime - startTime;
+//     cout << "[verifyPerformance] = " << repeatCount / ((double)verifyCost / 1000)
+//          << " tps" << endl;
+
+//     return 0;
+// }
