@@ -29,11 +29,11 @@ int main()
         cout << endl;
 
         cout << "Testing SM4 PKCS#7 mode encrypt" << version << " ..." << endl;
-        auto key = fromHex("00000000000000000000000000000000");  // GM
+        auto key = fromHex("E2CE587515495D6C4898F817FD6123D4");  // GM
         cout << "key = " << toHex(key) << endl;
 
-        auto iv = key;
-        cout << "iv = " << toHex(iv) << endl;
+        // auto iv = key;
+        cout << "iv = " << "00000000000000000000000000000000" << endl;
 
         auto data = fromHex(
             "5942D6DA31CD0A93E46CF382468710888F4393C6D734B3C6C6C44B1F6F34B08AEE0386B91831A268C4E981"
@@ -179,7 +179,7 @@ int main()
 
     {
         cout << endl;
-        cout << "Testing ECDSA/SM2 key pair generate" << version << " ..." << endl;
+        cout << "Testing ECDSA key pair generate" << version << " ..." << endl;
 
         bytes bytesKey =
             fromHex("F433FA2F17DCE76233C6C22F5636DC65B59C55CF48FFF4ABA92CF3E1BB2942A9");
@@ -193,43 +193,47 @@ int main()
         cout << endl;
         cout << "Testing ECDSA sign" << version << " ..." << endl;
         bytes bytesKey =
-            fromHex("88AF94B9E261CAEAAF7973F60B65465B410CAB4D783ACCDB1DEA5D0153FFECA5");
+            fromHex("E5DEE91B97DBB13E652F1780D076E44C1AAA774883EAF1A4DFBD2FCE2C6175EF");
         Secret secret(bytesKey);
         cout << "secretKey = " << toHex(secret.ref()) << endl;
         KeyPair keyPair(secret);
         cout << "ECDSA [keyPair.pub()] = " << keyPair.pub() << endl;
         h256 hash(fromHex("5D53469F20FEF4F8EAB52B88044EDE69C77A6A68A60728609FC4A65FF531E7D0"));
+        cout << "ECDSA [Sign.message] = " << hash << endl;
 
         Signature signature;
         signature = sign(keyPair.secret(), hash);
-        cout << "ECDSA/SM2 signature with pub = " << dev::Signature(signature) << endl;
+        cout << "ECDSA signature with V = " << dev::Signature(signature) << endl;
     }
 
-    // {
-    //     cout << endl;
-    //     cout << "Testing ECDSA verify" << version << " ..." << endl;
-    //     bytes bytesKey =
-    //         fromHex("D96C222D8602B287973E2ACA7E3FEDADFD0BD67F2914D3E16F46FAB8A8506F2B");
-    //     Secret secret(bytesKey);
-    //     cout << "secretKey = " << toHex(secret.ref()) << endl;
-    //     KeyPair keyPair(secret);
-    //     cout << "ECDSA [keyPair.pub()] = " << keyPair.pub() << endl;
-    //     h256 hash(fromHex("2DAEF60E7A0B8F5E024C81CD2AB3109F2B4F155CF83ADEB2AE5532F74A157FDF"));
+    {
+        cout << endl;
+        cout << "Testing ECDSA verify" << version << " ..." << endl;
+        bytes bytesKey =
+            fromHex("E5DEE91B97DBB13E652F1780D076E44C1AAA774883EAF1A4DFBD2FCE2C6175EF");
+        Secret secret(bytesKey);
+        cout << "secretKey = " << toHex(secret.ref()) << endl;
+        KeyPair keyPair(secret);
+        cout << "ECDSA [keyPair.pub()] = " << keyPair.pub() << endl;
+        h256 hash(fromHex("5D53469F20FEF4F8EAB52B88044EDE69C77A6A68A60728609FC4A65FF531E7D0"));
+        cout << "ECDSA [Sign.message] = " << hash << endl;
 
-    //     cout << "hash = " << hash << endl;
-
-
-    //     h256 r(fromHex("5356F5381FD5A35A75948E7D655CD153BE56E7D0008FDB0C54C0F60D4E53899C"));
-    //     h256 s(fromHex("90BC7949B959A49603B61F27E5F0B2B15402318D9E17BB08566DDBCD30A16354"));
-    //     h512 pub(keyPair.pub());
+        // h256 r(fromHex("e8644980bfb2e5aa0b4c84e1d5fe67c7af93147416477eaf8c188325bff42285"));
+        // h256 s(fromHex("62aeb6aeb44913a0150591ec65ef83c454da75338c6252053e28dd8c691b886b"));
+        // uint8_t v(0);
         
-    //     byte b = 27;
+        h256 r(fromHex("41042d69ec6ce4acddcc704ad26ea651361d5f59a001f9e5b4a33b5c58196e7b"));
+        h256 s(fromHex("6f84f812d2beda059fe0bef3ace87adbd49ac020103177ed9e1b0c7a006f3459"));
+        uint8_t v(1);
+        cout << "ECDSA [r] = " << r << endl;
+        cout << "ECDSA [s] = " << s << endl;
+        cout << "ECDSA [v] = " << v << endl;
 
-    //     SignatureStruct signature(r, s, b);
-    //     cout << "ECDSA verify signature with pub = " << dev::Signature(signature) << endl;
+        SignatureStruct signature(r, s, v);
+        cout << "ECDSA verify signature with pub = " << dev::Signature(signature) << endl;
 
-    //     cout << "ECDSA verfiy result = " << verify(pub, signature, hash) << endl;
-    // }
+        cout << "ECDSA verfiy result = " << verify(keyPair.pub(), signature, hash) << endl;
+    }
 #endif
     return 0;
 }
