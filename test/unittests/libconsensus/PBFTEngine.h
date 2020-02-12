@@ -96,7 +96,7 @@ P2PMessage::Ptr FakeReqMessage(std::shared_ptr<FakePBFTEngine> pbft, T const& re
 {
     bytes data;
     req.encode(data);
-    return pbft->transDataToMessage(ref(data), packetType, protocolId, ttl);
+    return pbft->transDataToMessageWrapper(ref(data), packetType, protocolId, ttl);
 }
 
 /// check the data received from the network
@@ -255,6 +255,12 @@ static void checkBackupMsg(FakeConsensus<FakePBFTEngine>& fake_pbft, std::string
         BOOST_CHECK(data.empty() == true);
     else
     {
+        // wait for pbftMsg commit to the backupDB
+        while (data.empty())
+        {
+            data = fake_pbft.consensus()->backupDB()->lookup(key);
+            sleep(1);
+        }
         BOOST_CHECK(data == toHex(msgData));
         /// remove the key
         std::string empty = "";
@@ -301,7 +307,7 @@ static void checkBroadcastSpecifiedMsg(
     key = req.uniqueKey();
     bytes data;
     req.encode(data);
-    fake_pbft.consensus()->broadcastMsg(SignReqPacket, key, ref(data));
+    fake_pbft.consensus()->broadcastMsgWrapper(SignReqPacket, key, ref(data));
     BOOST_CHECK(
         fake_pbft.consensus()->broadcastFilter(peer_keyPair.pub(), SignReqPacket, key) == true);
     compareAsyncSendTime(fake_pbft, peer_keyPair.pub(), 1);

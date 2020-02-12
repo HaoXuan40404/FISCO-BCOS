@@ -25,7 +25,7 @@
 
 提供多种编译部署方式，支持一键部署，支持Docker等所有主流平台的快速安装部署。提供了完整的工具套件来实现快速安装部署，系统监控、企业级数据治理等，解放开发人员的非业务开发时间。
 
-<div style="text-align:center"><img src="https://media.githubusercontent.com/media/FISCO-BCOS/LargeFiles/master/images/plane.jpg"/> </div>
+<div style="text-align:center"><img src="https://raw.githubusercontent.com/FISCO-BCOS/LargeFiles/master/images/plane.jpg"/> </div>
 
 更多信息，请[参阅2.0版本新特性](https://fisco-bcos-documentation.readthedocs.io/zh_CN/latest/docs/what_is_new.html#id11)。
 
@@ -35,7 +35,7 @@
 
 ## 文档
 
-阅读[**技术文档**](https://fisco-bcos-documentation.readthedocs.io/zh_CN/release-2.0/)，详细了解如何使用FISCO BCOS。
+阅读[**技术文档**](https://fisco-bcos-documentation.readthedocs.io/zh_CN/latest/)，详细了解如何使用FISCO BCOS。
 
 - [2.0版本新特性](https://fisco-bcos-documentation.readthedocs.io/zh_CN/latest/docs/what_is_new.html)
 - [版本及兼容](https://fisco-bcos-documentation.readthedocs.io/zh_CN/latest/docs/change_log/index.html)
@@ -59,13 +59,12 @@ FISCO BCOS已落地应用达数十个，场景覆盖政务、金融、公益、�
 - 文化版权：版权存证与交易等。
 - 社会管理：不动产登记等。
 
-此处提供一些具有代表性的[落地应用案例](https://mp.weixin.qq.com/s/vUSq80LkhF8yCfUF7AILgQ)。
+此处提供一些具有代表性的[落地应用案例](https://mp.weixin.qq.com/s/cUjuWf1eGMbG3AFq60CBUA)。
 
 
 ## 贡献代码
 
-- 我们欢迎并非常感谢您的贡献，请参阅[代码贡献流程](https://mp.weixin.qq.com/s/hEn2rxqnqp0dF6OKH6Ua-A
-)和[代码规范](../CODING_STYLE.md)。
+- 我们欢迎并非常感谢您的贡献，请参阅[代码贡献流程](https://mp.weixin.qq.com/s/_w_auH8X4SQQWO3lhfNrbQ)和[代码规范](../CODING_STYLE.md)。
 - 如项目对您有帮助，欢迎star支持！
 - 如果发现代码存在安全漏洞，请在[这里](https://security.webank.com)上报。
 
@@ -73,7 +72,7 @@ FISCO BCOS已落地应用达数十个，场景覆盖政务、金融、公益、�
 
 **FISCO BCOS开源社区**是国内活跃的开源社区，社区长期为机构和个人开发者提供各类支持与帮助。已有来自各行业的数千名技术爱好者在研究和使用FISCO BCOS。如您对FISCO BCOS开源技术及应用感兴趣，欢迎加入社区获得更多支持与帮助。
 
-![](https://media.githubusercontent.com/media/FISCO-BCOS/LargeFiles/master/images/QR_image.png)
+![](https://raw.githubusercontent.com/FISCO-BCOS/LargeFiles/master/images/QR_image.png)
 
 ## License
 
