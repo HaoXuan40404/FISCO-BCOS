@@ -30,6 +30,7 @@ if (DEMO)
     add_subdirectory(sync)
     add_subdirectory(evm)
     add_subdirectory(rpc)
+    add_subdirectory(crypto)
 endif()
 
 if (TOOL)

@@ -64,7 +64,28 @@ string dev::aesCBCDecrypt(const string& _cypherData, const string& _key)
 
 bytes dev::aesCBCEncrypt(bytesConstRef _plainData, bytesConstRef _key)
 {
-    bytesConstRef ivData = _key.cropped(0, 16);
+    bytesConstRef _ivData = _key.cropped(0, 16);
+    return aesCBCEncrypt(_plainData, _key, _ivData);
+}
+
+bytes dev::aesCBCDecrypt(bytesConstRef _cypherData, bytesConstRef _key)
+{
+    bytesConstRef _ivData = _key.cropped(0, 16);
+
+    return aesCBCDecrypt(_cypherData, _key, _ivData);
+}
+
+bytes dev::aesCBCEncrypt(bytesConstRef _plainData, bytesConstRef _key, bytesConstRef _ivData)
+{
+    // bytesConstRef ivData = _key.cropped(0, 16);
+    if(_key.size() != 16) {
+        CRYPTO_LOG(ERROR) << "[SM4::size] Error Key size";
+        BOOST_THROW_EXCEPTION(InvalidState());
+    }
+    if(_ivData.size() != 16) {
+        CRYPTO_LOG(ERROR) << "[SM4::size] Error iv size";
+        BOOST_THROW_EXCEPTION(InvalidState());
+    }
     int padding = _plainData.size() % 16;
     int nSize = 16 - padding;
     int inDataVLen = _plainData.size() + nSize;
@@ -75,18 +96,26 @@ bytes dev::aesCBCEncrypt(bytesConstRef _plainData, bytesConstRef _key)
     bytes enData(inDataVLen);
     SM4::getInstance().setKey((unsigned char*)_key.data(), _key.size());
     SM4::getInstance().cbcEncrypt(
-        inDataV.data(), enData.data(), inDataVLen, (unsigned char*)ivData.data(), 1);
+        inDataV.data(), enData.data(), inDataVLen, (unsigned char*)_ivData.data(), 1);
     // LOG(DEBUG)<<"ivData:"<<ascii2hex((const char*)ivData.data(),ivData.size());
     return enData;
 }
 
-bytes dev::aesCBCDecrypt(bytesConstRef _cypherData, bytesConstRef _key)
+bytes dev::aesCBCDecrypt(bytesConstRef _cypherData, bytesConstRef _key, bytesConstRef _ivData)
 {
-    bytesConstRef ivData = _key.cropped(0, 16);
+    // bytesConstRef ivData = _key.cropped(0, 16);
+    if(_key.size() != 16) {
+        CRYPTO_LOG(ERROR) << "[SM4::size] Error Key size";
+        BOOST_THROW_EXCEPTION(InvalidState());
+    }
+    if(_ivData.size() != 16) {
+        CRYPTO_LOG(ERROR) << "[SM4::size] Error iv size";
+        BOOST_THROW_EXCEPTION(InvalidState());
+    }
     bytes deData(_cypherData.size());
     SM4::getInstance().setKey((unsigned char*)_key.data(), _key.size());
     SM4::getInstance().cbcEncrypt((unsigned char*)_cypherData.data(), deData.data(),
-        _cypherData.size(), (unsigned char*)ivData.data(), 0);
+        _cypherData.size(), (unsigned char*)_ivData.data(), 0);
     int padding = deData.at(_cypherData.size() - 1);
     int deLen = _cypherData.size() - padding;
     deData.resize(deLen);

@@ -68,9 +68,21 @@ string dev::aesCBCDecrypt(const string& _cypherData, const string& _key)
 bytes dev::aesCBCEncrypt(bytesConstRef _plainData, bytesConstRef _key)
 {
     bytesConstRef ivData = _key.cropped(0, 16);
+    return aesCBCEncrypt(_plainData, _key, ivData);
+}
+
+bytes dev::aesCBCDecrypt(bytesConstRef _cypherData, bytesConstRef _key)
+{
+    bytes ivData = _key.cropped(0, 16).toBytes();
+
+    return aesCBCDecrypt(_cypherData, _key, ivData);
+}
+
+bytes dev::aesCBCEncrypt(bytesConstRef _plainData, bytesConstRef _key, bytesConstRef _ivData)
+{
     string cipherData;
     CryptoPP::AES::Encryption aesEncryption(_key.data(), _key.size());
-    CryptoPP::CBC_Mode_ExternalCipher::Encryption cbcEncryption(aesEncryption, ivData.data());
+    CryptoPP::CBC_Mode_ExternalCipher::Encryption cbcEncryption(aesEncryption, _ivData.data());
     CryptoPP::StreamTransformationFilter stfEncryptor(
         cbcEncryption, new CryptoPP::StringSink(cipherData));
     stfEncryptor.Put(_plainData.data(), _plainData.size());
@@ -78,14 +90,11 @@ bytes dev::aesCBCEncrypt(bytesConstRef _plainData, bytesConstRef _key)
     return asBytes(cipherData);
 }
 
-bytes dev::aesCBCDecrypt(bytesConstRef _cypherData, bytesConstRef _key)
+bytes dev::aesCBCDecrypt(bytesConstRef _cypherData, bytesConstRef _key, bytesConstRef _ivData)
 {
-    bytes ivData = _key.cropped(0, 16).toBytes();
-    // bytesConstRef ivData = _key.cropped(0, 16);
-    // LOG(DEBUG)<<"AES DE TYPE....................";
     string decryptedData;
     CryptoPP::AES::Decryption aesDecryption(_key.data(), _key.size());
-    CryptoPP::CBC_Mode_ExternalCipher::Decryption cbcDecryption(aesDecryption, ref(ivData).data());
+    CryptoPP::CBC_Mode_ExternalCipher::Decryption cbcDecryption(aesDecryption, ref(_ivData).data());
     CryptoPP::StreamTransformationFilter stfDecryptor(
         cbcDecryption, new CryptoPP::StringSink(decryptedData));
     // stfDecryptor.Put( reinterpret_cast<const unsigned char*>( cipherData.c_str() ),cipherLen);

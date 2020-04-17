@@ -25,12 +25,15 @@
 #pragma once
 
 #include "Common.h"
+#define CRYPTO_LOG(LEVEL) LOG(LEVEL) << "[CRYPTO] "
 
 namespace dev
 {
 DEV_SIMPLE_EXCEPTION(AESKeyLengthError);
 bytes aesCBCEncrypt(bytesConstRef _plainData, bytesConstRef _key);
 bytes aesCBCDecrypt(bytesConstRef _cypherData, bytesConstRef _key);
+bytes aesCBCEncrypt(bytesConstRef _plainData, bytesConstRef _key, bytesConstRef _ivData);
+bytes aesCBCDecrypt(bytesConstRef _cypherData, bytesConstRef _key, bytesConstRef _ivData);
 std::string aesCBCEncrypt(const std::string& _plainData, const std::string& _key);
 std::string aesCBCDecrypt(const std::string& _cypherData, const std::string& _key);
 }  // namespace dev
