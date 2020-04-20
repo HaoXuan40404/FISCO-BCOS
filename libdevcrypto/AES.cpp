@@ -73,7 +73,7 @@ bytes dev::aesCBCEncrypt(bytesConstRef _plainData, bytesConstRef _key)
 
 bytes dev::aesCBCDecrypt(bytesConstRef _cypherData, bytesConstRef _key)
 {
-    bytes ivData = _key.cropped(0, 16).toBytes();
+    bytesConstRef ivData = _key.cropped(0, 16);
 
     return aesCBCDecrypt(_cypherData, _key, ivData);
 }
@@ -94,7 +94,7 @@ bytes dev::aesCBCDecrypt(bytesConstRef _cypherData, bytesConstRef _key, bytesCon
 {
     string decryptedData;
     CryptoPP::AES::Decryption aesDecryption(_key.data(), _key.size());
-    CryptoPP::CBC_Mode_ExternalCipher::Decryption cbcDecryption(aesDecryption, ref(_ivData).data());
+    CryptoPP::CBC_Mode_ExternalCipher::Decryption cbcDecryption(aesDecryption, _ivData.data());
     CryptoPP::StreamTransformationFilter stfDecryptor(
         cbcDecryption, new CryptoPP::StringSink(decryptedData));
     // stfDecryptor.Put( reinterpret_cast<const unsigned char*>( cipherData.c_str() ),cipherLen);

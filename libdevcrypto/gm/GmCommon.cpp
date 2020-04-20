@@ -33,6 +33,8 @@ using namespace std;
 using namespace dev;
 using namespace dev::crypto;
 
+const static string ERROR_PRVATE_KEY = "0000000000000000000000000000000000000000000000000000000000000000";
+
 
 SignatureStruct::SignatureStruct(Signature const& _s)
 {
@@ -118,7 +120,9 @@ NumberVType dev::getVFromRLP(RLP const& _txRLPField)
  */
 Public dev::toPublic(Secret const& _secret)
 {
+
     string pri = toHex(bytesConstRef{_secret.data(), 32});
+    assert(pri != ERROR_PRVATE_KEY);
     string pub = SM2::getInstance().priToPub(pri);
     return Public(fromHex(pub));
 }

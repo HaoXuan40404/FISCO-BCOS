@@ -250,7 +250,6 @@ int SM2::verify(const string& _signData, int, const char* originalData, int orig
         goto err;
     }
 
-    // if (!ECDSA_sm2_get_Z((const EC_KEY*)sm2Key, NULL, "31323334353637383132333435363738", 32, zValue, &zValueLen))
     if (!ECDSA_sm2_get_Z((const EC_KEY*)sm2Key, NULL, "1234567812345678", 16, zValue, &zValueLen))
     {
         CRYPTO_LOG(ERROR) << "[SM2::veify] Error Of Compute Z" << LOG_KV("pubKey", publicKey);
@@ -309,7 +308,6 @@ int SM2::sm2GetZ(std::string const& _privateKey, const EC_KEY* _ecKey, unsigned 
         _zValueLen = cache.second;
         return 1;
     }
-    // auto ret = ECDSA_sm2_get_Z(_ecKey, NULL, "31323334353637383132333435363738", 32, _zValue, &_zValueLen);
     auto ret = ECDSA_sm2_get_Z(_ecKey, NULL, "1234567812345678", 16, _zValue, &_zValueLen);
     // clear the cache if over the capacity limit
     if (c_mapTozValueCache.size() >= c_maxMapTozValueCacheSize)
