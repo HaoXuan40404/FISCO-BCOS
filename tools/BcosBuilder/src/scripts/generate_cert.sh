@@ -4,7 +4,7 @@ set -e
 dirpath="$(cd "$(dirname "$0")" && pwd)"
 # cd "${dirpath}"
 
-cdn_link_header="https://osp-1257653870.cos.ap-guangzhou.myqcloud.com/FISCO-BCOS"
+cdn_link_header="https://https://github.com/FISCO-BCOS"
 
 command=""
 output_dir="cert"

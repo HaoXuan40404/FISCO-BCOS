@@ -48,8 +48,7 @@ hunter_config(evmone VERSION 8.2.0-53ff1c54
 hunter_config(
     Boost VERSION "1.76.0-local"
     URL
-    "https://osp-1257653870.cos.ap-guangzhou.myqcloud.com/FISCO-BCOS/FISCO-BCOS/deps/boost_1_76_0.tar.bz2
-    https://downloads.sourceforge.net/project/boost/boost/1.76.0/source/boost_1_76_0.tar.bz2
+    "https://downloads.sourceforge.net/project/boost/boost/1.76.0/source/boost_1_76_0.tar.bz2
     https://nchc.dl.sourceforge.net/project/boost/boost/1.76.0/boost_1_76_0.tar.bz2"
     SHA1
     8064156508312dde1d834fec3dca9b11006555b6
@@ -60,8 +59,7 @@ hunter_config(
 hunter_config(
     Protobuf VERSION "3.14.0-4a09d77-p0-local"
     URL
-    "https://osp-1257653870.cos.ap-guangzhou.myqcloud.com/FISCO-BCOS/deps/protobuf/v3.14.0-4a09d77-p0.tar.gz
-    https://github.com/cpp-pm/protobuf/archive/v3.14.0-4a09d77-p0.tar.gz"
+    "https://github.com/cpp-pm/protobuf/archive/v3.14.0-4a09d77-p0.tar.gz"
     SHA1
     3553ff3bfd7d0c4c1413b1552064b3dca6fa213e
 )
@@ -69,8 +67,7 @@ hunter_config(
 hunter_config(
     Microsoft.GSL VERSION "2.0.0-p0-local"
     URL
-    "https://osp-1257653870.cos.ap-guangzhou.myqcloud.com/FISCO-BCOS/deps/Microsoft.GSL/v2.0.0-p0.tar.gz
-    https://github.com/hunter-packages/Microsoft.GSL/archive/v2.0.0-p0.tar.gz"
+    "https://github.com/hunter-packages/Microsoft.GSL/archive/v2.0.0-p0.tar.gz"
     SHA1
     a94c9c1e41edf787a1c080b7cab8f2f4217dbc4b
 )
@@ -78,8 +75,7 @@ hunter_config(
 hunter_config(
     jsoncpp VERSION "1.8.0-local"
     URL
-    "https://osp-1257653870.cos.ap-guangzhou.myqcloud.com/FISCO-BCOS/deps/jsoncpp/1.8.0.tar.gz
-    https://github.com/open-source-parsers/jsoncpp/archive/1.8.0.tar.gz"
+    "https://github.com/open-source-parsers/jsoncpp/archive/1.8.0.tar.gz"
     SHA1
     40f7f34551012f68e822664a0b179e7e6cac5a97
 )
