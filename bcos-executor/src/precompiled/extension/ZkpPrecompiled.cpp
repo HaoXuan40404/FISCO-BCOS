@@ -44,10 +44,14 @@ const char* const VERIFY_PRODUCT_PROOF =
 const char* const VERIFY_EQUALITY_PROOF = "verifyEqualityProof(bytes,bytes,bytes,bytes,bytes)";
 // wedpr_aggregate_ristretto_point(*point_sum, *point_share,result);
 const char* const AGGREGATE_POINT = "aggregatePoint(bytes,bytes)";
+// wedpr_verify_range_proof(commitment_point, proof, blinding_basepoint)
+const char* const VERIFY_RANGE_PROOF = "verifyRangeProof(bytes,bytes,bytes)";
+
 
 ZkpPrecompiled::ZkpPrecompiled(bcos::crypto::Hash::Ptr _hashImpl) : Precompiled(_hashImpl)
 {
     m_zkpImpl = std::make_shared<bcos::crypto::DiscreteLogarithmZkp>();
+    m_rangeZkpImpl = std::make_shared<bcos::crypto::RangeProofZkp>();
 
     name2Selector[VERIFY_EITHER_EQUALITY_PROOF_STR] =
         getFuncSelector(VERIFY_EITHER_EQUALITY_PROOF_STR, _hashImpl);
@@ -58,6 +62,7 @@ ZkpPrecompiled::ZkpPrecompiled(bcos::crypto::Hash::Ptr _hashImpl) : Precompiled(
     name2Selector[VERIFY_PRODUCT_PROOF] = getFuncSelector(VERIFY_PRODUCT_PROOF, _hashImpl);
     name2Selector[VERIFY_EQUALITY_PROOF] = getFuncSelector(VERIFY_EQUALITY_PROOF, _hashImpl);
     name2Selector[AGGREGATE_POINT] = getFuncSelector(AGGREGATE_POINT, _hashImpl);
+    name2Selector[VERIFY_RANGE_PROOF] = getFuncSelector(VERIFY_RANGE_PROOF, _hashImpl);
 }
 std::shared_ptr<PrecompiledExecResult> ZkpPrecompiled::call(
     std::shared_ptr<executor::TransactionExecutive> _executive,
@@ -103,6 +108,11 @@ std::shared_ptr<PrecompiledExecResult> ZkpPrecompiled::call(
     {
         // aggregateRistrettoPoint
         aggregateRistrettoPoint(codec, paramData, _callParameters);
+    }
+    else if (name2Selector[VERIFY_RANGE_PROOF] == funcSelector)
+    {
+        // verifyRangeProof
+        verifyRangeProof(codec, paramData, _callParameters);
     }
     else
     {
@@ -300,4 +310,25 @@ void ZkpPrecompiled::aggregateRistrettoPoint(
                                << LOG_KV("message", boost::diagnostic_information(e));
     }
     _callResult->setExecResult(_codec.encode(retCode, result));
+}
+
+void ZkpPrecompiled::verifyRangeProof(
+    CodecWrapper const& _codec, bytesConstRef _paramData, PrecompiledExecResult::Ptr _callResult)
+{
+    bool verifyResult = false;
+    try
+    {
+        bytes cPoint;
+        bytes rangeProof;
+        bytes blindingBasePoint;
+        _codec.decode(_paramData, cPoint, rangeProof, blindingBasePoint);
+        verifyResult = m_rangeZkpImpl->verifyRangeProof(cPoint, rangeProof, blindingBasePoint);
+    }
+    catch (std::exception const& e)
+    {
+        PRECOMPILED_LOG(DEBUG) << LOG_DESC("verifyRangeProof exception")
+                               << LOG_KV("message", boost::diagnostic_information(e));
+    }
+    _callResult->setExecResult(_codec.encode(verifyResult));
+    PRECOMPILED_LOG(TRACE) << LOG_DESC("verifyRangeProof: ") << verifyResult;
 }

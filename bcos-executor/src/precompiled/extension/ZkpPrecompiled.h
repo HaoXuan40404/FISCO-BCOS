@@ -23,6 +23,7 @@
 #include "../../vm/Precompiled.h"
 #include "bcos-executor/src/precompiled/common/Common.h"
 #include <bcos-crypto/zkp/discretezkp/DiscreteLogarithmZkp.h>
+#include <bcos-crypto/zkp/rangezkp/RangeProofZkp.h>
 
 namespace bcos
 {
@@ -75,8 +76,12 @@ private:
     void aggregateRistrettoPoint(CodecWrapper const& _codec, bytesConstRef _paramData,
         PrecompiledExecResult::Ptr _callResult);
 
+    void verifyRangeProof(CodecWrapper const& _codec, bytesConstRef _paramData,
+        PrecompiledExecResult::Ptr _callResult);
+
 private:
     bcos::crypto::DiscreteLogarithmZkp::Ptr m_zkpImpl;
+    bcos::crypto::RangeProofZkp::Ptr m_rangeZkpImpl;
 };
 }  // namespace precompiled
 }  // namespace bcos

@@ -12,4 +12,5 @@ abstract contract ZkpPrecompiled
     function verifyEqualityProof(bytes memory c1_point, bytes memory c2_point, bytes memory proof, bytes memory basepoint1, bytes memory basepoint2)public virtual view returns(bool);
 
     function aggregatePoint(bytes memory point1, bytes memory point2) public virtual view returns(bool, bytes memory);
+    function verifyRangeProof(bytes memory c_point, bytes memory proof, bytes memory blinding_basepoint)public virtual view returns(bool);
 }
