@@ -21,6 +21,7 @@
 #pragma once
 #include <bcos-utilities/Common.h>
 #include <wedpr-crypto/WedprDiscreteLogarithmProof.h>
+#include <cstdint>
 #include <memory>
 namespace bcos
 {
@@ -61,6 +62,17 @@ public:
 
     // wedpr_aggregate_ristretto_point
     bytes aggregateRistrettoPoint(bytes const& pointSum, bytes const& pointShare);
+
+    // wedpr_verify_knowledge_proof_without_basepoint
+    bool verifyKnowledgeProofWithoutBasePoint(bytes const& pointData, bytes const& knowledgeProof);
+
+    // wedpr_verify_sum_relationship_without_basepoint
+    bool verifySumProofWithoutBasePoint(bytes const& c1Point, bytes const& c2Point, bytes const& c3Point,
+        bytes const& arithmeticProof);
+
+    // wedpr_verify_value_equality_relationship_proof_without_basepoint
+    bool verifyValueEqualityProofWithoutBasePoint(int64_t c_value, bytes const& c_point_data,
+        bytes const& equalityProof);
 
 private:
     size_t m_pointLen = 32;

@@ -35,3 +35,13 @@ bool RangeProofZkp::verifyRangeProof(
     auto ret = wedpr_verify_range_proof(&cPoint, &proof, &blindingBasePoint);
     return ret == WEDPR_SUCCESS;
 }
+
+// wedpr_verify_range_proof_without_basepoint
+bool RangeProofZkp::verifyRangeProofWithoutBasePoint(
+    bytes const& cPointData, bytes const& rangeProof)
+{
+    auto cPoint = bytesToInputBuffer(cPointData, m_pointLen);
+    CInputBuffer proof{(const char*)rangeProof.data(), rangeProof.size()};
+    auto ret = wedpr_verify_range_proof_without_basepoint(&cPoint, &proof);
+    return ret == WEDPR_SUCCESS;
+}

@@ -159,3 +159,47 @@ bytes DiscreteLogarithmZkp::aggregateRistrettoPoint(bytes const& pointSum, bytes
     }
     BOOST_THROW_EXCEPTION(ZkpExcetpion() << errinfo_comment("aggregateRistrettoPoint failed"));
 }
+
+// wedpr_verify_knowledge_proof_without_basepoint
+bool DiscreteLogarithmZkp::verifyKnowledgeProofWithoutBasePoint(
+    bytes const& pointData, bytes const& knowledgeProofData)
+{
+    auto point = bytesToInputBuffer(pointData, m_pointLen);
+    CInputBuffer proof{(const char*)knowledgeProofData.data(), knowledgeProofData.size()};
+    auto ret = wedpr_verify_knowledge_proof_without_basepoint(&point, &proof);
+    if (ret == WEDPR_SUCCESS)
+    {
+        return true;
+    }
+    return false;
+}
+
+// wedpr_verify_sum_relationship_without_basepoint
+bool DiscreteLogarithmZkp::verifySumProofWithoutBasePoint(bytes const& c1Point, bytes const& c2Point,
+    bytes const& c3Point, bytes const& arithmeticProofData)
+{
+    auto c1 = bytesToInputBuffer(c1Point, m_pointLen);
+    auto c2 = bytesToInputBuffer(c2Point, m_pointLen);
+    auto c3 = bytesToInputBuffer(c3Point, m_pointLen);
+    CInputBuffer proof{(const char*)arithmeticProofData.data(), arithmeticProofData.size()};
+    auto ret = wedpr_verify_sum_relationship_without_basepoint(&c1, &c2, &c3, &proof);
+    if (ret == WEDPR_SUCCESS)
+    {
+        return true;
+    }
+    return false;
+}
+
+// wedpr_verfy_value_equality_relationship_proof_without_basepoint
+bool DiscreteLogarithmZkp::verifyValueEqualityProofWithoutBasePoint(int64_t cValue,
+    bytes const& cPointData, bytes const& equalityProofData)
+{
+    auto cPoint = bytesToInputBuffer(cPointData, m_pointLen);
+    CInputBuffer proof{(const char*)equalityProofData.data(), equalityProofData.size()};
+    auto ret = wedpr_verify_value_equality_relationship_proof_without_basepoint(cValue, &cPoint, &proof);
+    if (ret == WEDPR_SUCCESS)
+    {
+        return true;
+    }
+    return false;
+}

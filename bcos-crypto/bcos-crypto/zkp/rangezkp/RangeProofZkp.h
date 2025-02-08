@@ -66,6 +66,10 @@ public:
     // wedpr_verify_range_proof
     bool verifyRangeProof(bytes const& cPointData,
         bytes const& rangeProof, bytes const& blindingBasePointData);
+    
+        // wedpr_verify_range_proof_without_basepoint
+    bool verifyRangeProofWithoutBasePoint(bytes const& cPointData,
+        bytes const& rangeProof);
 
 private:
     size_t m_pointLen = 32;

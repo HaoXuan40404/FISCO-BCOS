@@ -46,11 +46,20 @@ const char* const VERIFY_EQUALITY_PROOF = "verifyEqualityProof(bytes,bytes,bytes
 const char* const AGGREGATE_POINT = "aggregatePoint(bytes,bytes)";
 // wedpr_verify_range_proof(commitment_point, proof, blinding_basepoint)
 const char* const VERIFY_RANGE_PROOF = "verifyRangeProof(bytes,bytes,bytes)";
+// verifyRangeProofWithoutBasePoint(commitment_point, proof)
+const char* const VERIFY_RANGE_PROOF_WITHOUT_BASEPOINT = "verifyRangeProofWithoutBasePoint(bytes,bytes)";
+// verifyKnowledgeProofWithoutBasePoint(pointData, knowledgeProofData)
+const char* const VERIFY_KNOWLEDGE_PROOF_WITHOUT_BASEPOINT = "verifyKnowledgeProofWithoutBasePoint(bytes,bytes)";
+// verifySumProofWithoutBasePoint(c1Point, c2Point, c3Point, arithmeticProofData)
+const char* const VERIFY_SUM_PROOF_WITHOUT_BASEPOINT = "verifySumProofWithoutBasePoint(bytes,bytes,bytes,bytes)";
+// verifyValueEqualityProofWithoutBasePoint(c_value, cPoint, proofData)
+const char* const VERIFY_VALUE_EQUALITY_PROOF_WITHOUT_BASEPOINT = "verifyValueEqualityProofWithoutBasePoint(uint64,bytes,bytes)";
 
 
 ZkpPrecompiled::ZkpPrecompiled(bcos::crypto::Hash::Ptr _hashImpl) : Precompiled(_hashImpl)
 {
     m_zkpImpl = std::make_shared<bcos::crypto::DiscreteLogarithmZkp>();
+    m_rangeZkpImpl = std::make_shared<bcos::crypto::RangeProofZkp>();
 
     name2Selector[VERIFY_EITHER_EQUALITY_PROOF_STR] =
         getFuncSelector(VERIFY_EITHER_EQUALITY_PROOF_STR, _hashImpl);
@@ -61,6 +70,15 @@ ZkpPrecompiled::ZkpPrecompiled(bcos::crypto::Hash::Ptr _hashImpl) : Precompiled(
     name2Selector[VERIFY_PRODUCT_PROOF] = getFuncSelector(VERIFY_PRODUCT_PROOF, _hashImpl);
     name2Selector[VERIFY_EQUALITY_PROOF] = getFuncSelector(VERIFY_EQUALITY_PROOF, _hashImpl);
     name2Selector[AGGREGATE_POINT] = getFuncSelector(AGGREGATE_POINT, _hashImpl);
+    name2Selector[VERIFY_RANGE_PROOF] = getFuncSelector(VERIFY_RANGE_PROOF, _hashImpl);
+    name2Selector[VERIFY_RANGE_PROOF_WITHOUT_BASEPOINT] =
+        getFuncSelector(VERIFY_RANGE_PROOF_WITHOUT_BASEPOINT, _hashImpl);
+    name2Selector[VERIFY_KNOWLEDGE_PROOF_WITHOUT_BASEPOINT] =
+        getFuncSelector(VERIFY_KNOWLEDGE_PROOF_WITHOUT_BASEPOINT, _hashImpl);
+    name2Selector[VERIFY_SUM_PROOF_WITHOUT_BASEPOINT] =
+        getFuncSelector(VERIFY_SUM_PROOF_WITHOUT_BASEPOINT, _hashImpl);
+    name2Selector[VERIFY_VALUE_EQUALITY_PROOF_WITHOUT_BASEPOINT] =
+        getFuncSelector(VERIFY_VALUE_EQUALITY_PROOF_WITHOUT_BASEPOINT, _hashImpl);
 }
 std::shared_ptr<PrecompiledExecResult> ZkpPrecompiled::call(
     std::shared_ptr<executor::TransactionExecutive> _executive,
@@ -111,6 +129,26 @@ std::shared_ptr<PrecompiledExecResult> ZkpPrecompiled::call(
     {
         // verifyRangeProof
         verifyRangeProof(codec, paramData, _callParameters);
+    }
+    else if (name2Selector[VERIFY_RANGE_PROOF_WITHOUT_BASEPOINT] == funcSelector)
+    {
+        // verifyRangeProofWithoutBasePoint
+        verifyRangeProofWithoutBasePoint(codec, paramData, _callParameters);
+    }
+    else if (name2Selector[VERIFY_KNOWLEDGE_PROOF_WITHOUT_BASEPOINT] == funcSelector)
+    {
+        // verifyKnowledgeProofWithoutBasePoint
+        verifyKnowledgeProofWithoutBasePoint(codec, paramData, _callParameters);
+    }
+    else if (name2Selector[VERIFY_SUM_PROOF_WITHOUT_BASEPOINT] == funcSelector)
+    {
+        // verifySumProofWithoutBasePoint
+        verifySumProofWithoutBasePoint(codec, paramData, _callParameters);
+    }
+    else if (name2Selector[VERIFY_VALUE_EQUALITY_PROOF_WITHOUT_BASEPOINT] == funcSelector)
+    {
+        // verifyValueEqualityProofWithoutBasePoint
+        verifyValueEqualityProofWithoutBasePoint(codec, paramData, _callParameters);
     }
     else
     {
@@ -330,4 +368,89 @@ void ZkpPrecompiled::verifyRangeProof(
     }
     _callResult->setExecResult(_codec.encode(verifyResult));
     PRECOMPILED_LOG(TRACE) << LOG_DESC("verifyRangeProof: ") << verifyResult;
+}
+
+void ZkpPrecompiled::verifyRangeProofWithoutBasePoint(
+    CodecWrapper const& _codec, bytesConstRef _paramData, PrecompiledExecResult::Ptr _callResult)
+{
+    bool verifyResult = false;
+    try
+    {
+        bytes cPoint;
+        bytes rangeProof;
+        _codec.decode(_paramData, cPoint, rangeProof);
+        verifyResult = m_rangeZkpImpl->verifyRangeProofWithoutBasePoint(cPoint, rangeProof);
+    }
+    catch (std::exception const& e)
+    {
+        PRECOMPILED_LOG(DEBUG) << LOG_DESC("verifyRangeProofWithoutBasePoint exception")
+                               << LOG_KV("message", boost::diagnostic_information(e));
+    }
+    _callResult->setExecResult(_codec.encode(verifyResult));
+    PRECOMPILED_LOG(TRACE) << LOG_DESC("verifyRangeProofWithoutBasePoint: ") << verifyResult;
+}
+
+void ZkpPrecompiled::verifyKnowledgeProofWithoutBasePoint(
+    CodecWrapper const& _codec, bytesConstRef _paramData, PrecompiledExecResult::Ptr _callResult)
+{
+    bool verifyResult = false;
+    try
+    {
+        bytes pointData;
+        bytes knowledgeProof;
+        _codec.decode(_paramData, pointData, knowledgeProof);
+        verifyResult = m_zkpImpl->verifyKnowledgeProofWithoutBasePoint(pointData, knowledgeProof);
+    }
+    catch (std::exception const& e)
+    {
+        PRECOMPILED_LOG(DEBUG) << LOG_DESC("verifyKnowledgeProofWithoutBasePoint exception")
+                               << LOG_KV("message", boost::diagnostic_information(e));
+    }
+    _callResult->setExecResult(_codec.encode(verifyResult));
+    PRECOMPILED_LOG(TRACE) << LOG_DESC("verifyKnowledgeProofWithoutBasePoint: ") << verifyResult;
+}
+
+void ZkpPrecompiled::verifySumProofWithoutBasePoint(
+    CodecWrapper const& _codec, bytesConstRef _paramData, PrecompiledExecResult::Ptr _callResult)
+{
+    bool verifyResult = false;
+    try
+    {
+        bytes c1Point;
+        bytes c2Point;
+        bytes c3Point;
+        bytes arithmeticProofData;
+        _codec.decode(_paramData, c1Point, c2Point, c3Point, arithmeticProofData);
+        verifyResult = m_zkpImpl->verifySumProofWithoutBasePoint(
+            c1Point, c2Point, c3Point, arithmeticProofData);
+    }
+    catch (std::exception const& e)
+    {
+        PRECOMPILED_LOG(DEBUG) << LOG_DESC("verifySumProofWithoutBasePoint exception")
+                               << LOG_KV("message", boost::diagnostic_information(e));
+    }
+    _callResult->setExecResult(_codec.encode(verifyResult));
+    PRECOMPILED_LOG(TRACE) << LOG_DESC("verifySumProofWithoutBasePoint: ") << verifyResult;
+}
+
+void ZkpPrecompiled::verifyValueEqualityProofWithoutBasePoint(
+    CodecWrapper const& _codec, bytesConstRef _paramData, PrecompiledExecResult::Ptr _callResult)
+{
+    bool verifyResult = false;
+    try
+    {
+        u_int64_t cValue;
+        bytes cPointData;
+        bytes equalityProofData;
+        _codec.decode(_paramData, cValue, cPointData, equalityProofData);
+        verifyResult = m_zkpImpl->verifyValueEqualityProofWithoutBasePoint(
+            cValue, cPointData, equalityProofData);
+    }
+    catch (std::exception const& e)
+    {
+        PRECOMPILED_LOG(DEBUG) << LOG_DESC("verifyValueEqualityProofWithoutBasePoint exception")
+                               << LOG_KV("message", boost::diagnostic_information(e));
+    }
+    _callResult->setExecResult(_codec.encode(verifyResult));
+    PRECOMPILED_LOG(TRACE) << LOG_DESC("verifyValueEqualityProofWithoutBasePoint: ") << verifyResult;
 }
