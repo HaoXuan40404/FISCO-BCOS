@@ -69,7 +69,6 @@ private:
     void verifyProductProof(CodecWrapper const& _codec, bytesConstRef _paramData,
         PrecompiledExecResult::Ptr _callResult);
 
-
     void verifyEqualityProof(CodecWrapper const& _codec, bytesConstRef _paramData,
         PrecompiledExecResult::Ptr _callResult);
 
@@ -89,6 +88,9 @@ private:
         PrecompiledExecResult::Ptr _callResult);
 
     void verifyValueEqualityProofWithoutBasePoint(CodecWrapper const& _codec, bytesConstRef _paramData,
+        PrecompiledExecResult::Ptr _callResult);
+    
+    void verifyMultiSumProofWithoutBasePoint(CodecWrapper const& _codec, bytesConstRef _paramData,
         PrecompiledExecResult::Ptr _callResult);
 
 private:

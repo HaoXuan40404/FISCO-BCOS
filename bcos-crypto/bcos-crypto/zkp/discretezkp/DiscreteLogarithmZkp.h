@@ -74,6 +74,10 @@ public:
     bool verifyValueEqualityProofWithoutBasePoint(int64_t c_value, bytes const& c_point_data,
         bytes const& equalityProof);
 
+    // wedpr_verify_multi_sum_relationship_without_basepoint
+    bool verifyMultiSumProofWithoutBasePoint(bytes const& inputPoints, bytes const& outputPoints,
+        bytes const& relationshipProof);
+
 private:
     size_t m_pointLen = 32;
 };

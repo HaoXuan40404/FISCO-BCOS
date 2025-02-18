@@ -54,6 +54,8 @@ const char* const VERIFY_KNOWLEDGE_PROOF_WITHOUT_BASEPOINT = "verifyKnowledgePro
 const char* const VERIFY_SUM_PROOF_WITHOUT_BASEPOINT = "verifySumProofWithoutBasePoint(bytes,bytes,bytes,bytes)";
 // verifyValueEqualityProofWithoutBasePoint(c_value, cPoint, proofData)
 const char* const VERIFY_VALUE_EQUALITY_PROOF_WITHOUT_BASEPOINT = "verifyValueEqualityProofWithoutBasePoint(uint64,bytes,bytes)";
+// wedpr_verify_multi_sum_relationship(input_points, output_points, proof)
+const char* const VERIFY_MULTI_SUM_PROOF = "verifyMultiSumProofWithoutBasePoint(bytes,bytes,bytes)";
 
 
 ZkpPrecompiled::ZkpPrecompiled(bcos::crypto::Hash::Ptr _hashImpl) : Precompiled(_hashImpl)
@@ -79,6 +81,8 @@ ZkpPrecompiled::ZkpPrecompiled(bcos::crypto::Hash::Ptr _hashImpl) : Precompiled(
         getFuncSelector(VERIFY_SUM_PROOF_WITHOUT_BASEPOINT, _hashImpl);
     name2Selector[VERIFY_VALUE_EQUALITY_PROOF_WITHOUT_BASEPOINT] =
         getFuncSelector(VERIFY_VALUE_EQUALITY_PROOF_WITHOUT_BASEPOINT, _hashImpl);
+    name2Selector[VERIFY_MULTI_SUM_PROOF] =
+        getFuncSelector(VERIFY_MULTI_SUM_PROOF, _hashImpl);
 }
 std::shared_ptr<PrecompiledExecResult> ZkpPrecompiled::call(
     std::shared_ptr<executor::TransactionExecutive> _executive,
@@ -149,6 +153,11 @@ std::shared_ptr<PrecompiledExecResult> ZkpPrecompiled::call(
     {
         // verifyValueEqualityProofWithoutBasePoint
         verifyValueEqualityProofWithoutBasePoint(codec, paramData, _callParameters);
+    }
+    else if (name2Selector[VERIFY_MULTI_SUM_PROOF] == funcSelector)
+    {
+        // verifyMultiSumProofWithoutBasePoint
+        verifyMultiSumProofWithoutBasePoint(codec, paramData, _callParameters);
     }
     else
     {
@@ -453,4 +462,26 @@ void ZkpPrecompiled::verifyValueEqualityProofWithoutBasePoint(
     }
     _callResult->setExecResult(_codec.encode(verifyResult));
     PRECOMPILED_LOG(TRACE) << LOG_DESC("verifyValueEqualityProofWithoutBasePoint: ") << verifyResult;
+}
+
+void ZkpPrecompiled::verifyMultiSumProofWithoutBasePoint(
+    CodecWrapper const& _codec, bytesConstRef _paramData, PrecompiledExecResult::Ptr _callResult)
+{
+    bool verifyResult = false;
+    try
+    {
+        bytes inputPoints;
+        bytes outputPoints;
+        bytes relationshipProof;
+        _codec.decode(_paramData, inputPoints, outputPoints, relationshipProof);
+        verifyResult = m_zkpImpl->verifyMultiSumProofWithoutBasePoint(
+            inputPoints, outputPoints, relationshipProof);
+    }
+    catch (std::exception const& e)
+    {
+        PRECOMPILED_LOG(DEBUG) << LOG_DESC("verifyMultiSumProofWithoutBasePoint exception")
+                               << LOG_KV("message", boost::diagnostic_information(e));
+    }
+    _callResult->setExecResult(_codec.encode(verifyResult));
+    PRECOMPILED_LOG(TRACE) << LOG_DESC("verifyMultiSumProofWithoutBasePoint: ") << verifyResult;
 }

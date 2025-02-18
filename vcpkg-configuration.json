@@ -3,7 +3,7 @@
     {
       "kind": "git",
       "repository": "https://github.com/HaoXuan40404/registry.git",
-      "baseline": "ac77fca37888d16615a2ab9bf28dd361b260ea8d",
+      "baseline": "a9a2463eb3b28c49f6132ec65da9d1510eb27694",
       "packages": [
         "openssl",
         "evmone",
